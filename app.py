@@ -1,8 +1,15 @@
 import streamlit as st
 from google import genai
 
-# Initialize the client securely using your working API Key
-client = genai.Client(api_key="AQ.Ab8RN6Kr-TY7C1Dor0JMtg332aHv8GCWhe92QHKGgLuvdfm9Yg")
+# Streamlit Cloud के Secrets से API key को ऑटोमैटिक उठाने के लिए सेटअप
+if "api_key" in st.secrets:
+    SECRET_API_KEY = st.secrets["api_key"]
+else:
+    # लोकल कंप्यूटर पर बैकअप के लिए आपकी चाबी
+    SECRET_API_KEY = "AQ.Ab8RN6Kr-TY7C1Dor0JMtg332aHv8GCWhe92QHKGgLuvdfm9Yg"
+
+# Client को सही सीक्रेट की (Key) के साथ कनेक्ट करना
+client = genai.Client(api_key=SECRET_API_KEY)
 
 # Google SEO and Search Configuration Settings
 st.set_page_config(
@@ -16,7 +23,7 @@ st.set_page_config(
 # Website Header Title
 st.title("💊 PharmaNomix AI")
 
-# Your customized tagline
+# Tagline
 st.caption("Developed by PRATEEK SHIVHARE")
 
 st.write("Find unique and meaningful names for your new medical store or pharma startup.")
@@ -37,7 +44,6 @@ if st.button("Generate Unique Names ✨"):
     else:
         with st.spinner("AI is thinking of the best names... Please wait..."):
             try:
-                # Prompt Engineering - Instructing the AI to return everything in English
                 prompt = f"""
                 You are an expert business naming assistant specialized in the pharmaceutical and healthcare industry.
                 A user wants to open a "{store_type}" located in "{location}". 
@@ -52,13 +58,11 @@ if st.button("Generate Unique Names ✨"):
                 Make sure the names sound professional and are easy to pronounce. Do not give generic or common names. Everything must be outputted in English.
                 """
                 
-                # Requesting a response from the updated model
                 response = client.models.generate_content(
                     model='gemini-2.5-flash',
                     contents=prompt,
                 )
                 
-                # Displaying the final English results on the screen
                 st.success("Here are 10 excellent names for you:")
                 st.write(response.text)
                 
